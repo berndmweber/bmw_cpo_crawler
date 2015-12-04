@@ -28,9 +28,13 @@ require 'colorize'
 
 vin_struct = Struct::new( "VINStruct", :price, :link)
 
-if ARGV[0] == '550i'
+case ARGV[0]
+when '550i'
 	type = '550i'
 	PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?year=2013-2013&odometer=1-40000&highwayMpg=&normalPackages=Driver+Assistance&superModel=5+Series&gvModel=550i&compositeType=used&geoZip=95051&geoRadius=0&showSelections=true&showFacetCounts=true&showSubmit=true&searchLinkText=SEARCH&facetbrowse=true&showRadius=true"
+when 'M5'
+	type = 'M5'
+	PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?superModel=M+Series&gvModel=M5&compositeType=certified&geoZip=95051&geoRadius=0&sortBy=internetPrice+asc&internetPrice=1-9999999"
 else
 	type = '550ixDrive'
 	PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?year=2013-2013&odometer=1-40000&highwayMpg=&normalPackages=Driver+Assistance&superModel=5+Series&gvModel=550i+xDrive&compositeType=used&geoZip=95051&geoRadius=0&showSelections=true&showFacetCounts=true&showSubmit=true&searchLinkText=SEARCH&facetbrowse=true&showRadius=true"
