@@ -103,9 +103,9 @@ newVinHash.each do |key, value|
 			puts 'Changed entry:'
 			puts ' VIN: ' + key
 			if oldVinHash[key].price < value.price
-				puts ' Price: '.red + value.price.red
+				puts ' Price: ' + oldVinHash[key].price + ' -> ' + value.price.red
 			else
-				puts ' Price: '.green + value.price.green
+				puts ' Price: ' + oldVinHash[key].price + ' -> ' + value.price.green
 			end
 			puts ' Link: ' + value.link
 			puts ' ---------- '
