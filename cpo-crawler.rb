@@ -27,26 +27,58 @@ require 'yaml'
 require 'colorize'
 
 vin_struct = Struct::new( "VINStruct", :price, :link)
+replaceLatestCheck = FALSE
+foundSearch = FALSE
+type = nil
 
-case ARGV[0]
-when '550i'
-	type = '550i'
-	PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?year=2013-2013&odometer=1-40000&highwayMpg=&normalPackages=Driver+Assistance&superModel=5+Series&gvModel=550i&compositeType=used&geoZip=95051&geoRadius=0&showSelections=true&showFacetCounts=true&showSubmit=true&searchLinkText=SEARCH&facetbrowse=true&showRadius=true"
-when 'M5'
-	type = 'M5'
-	PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?superModel=M+Series&gvModel=M5&compositeType=certified&geoZip=95051&geoRadius=0&sortBy=internetPrice+asc&internetPrice=1-9999999"
-else
-	type = '550ixDrive'
-	PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?year=2013-2013&odometer=1-40000&highwayMpg=&normalPackages=Driver+Assistance&superModel=5+Series&gvModel=550i+xDrive&compositeType=used&geoZip=95051&geoRadius=0&showSelections=true&showFacetCounts=true&showSubmit=true&searchLinkText=SEARCH&facetbrowse=true&showRadius=true"
+ARGV.each do |arg|
+	if /^-/.match(arg)
+		case arg
+		when "-N"
+			replaceLatestCheck = TRUE
+		else
+			puts "This parameter \"" + arg + "\" is currently not supported."
+		end
+	else
+		foundSearch = TRUE
+		case arg
+		when '550i'
+			type = '550i'
+			PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?year=2013-2013&odometer=1-40000&highwayMpg=&normalPackages=Driver+Assistance&superModel=5+Series&gvModel=550i&compositeType=used&geoZip=95051&geoRadius=0&showSelections=true&showFacetCounts=true&showSubmit=true&searchLinkText=SEARCH&facetbrowse=true&showRadius=true"
+		when 'M5'
+			type = 'M5'
+			PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?superModel=M+Series&gvModel=M5&compositeType=certified&geoZip=95051&geoRadius=0&sortBy=internetPrice+asc&internetPrice=1-9999999"
+		when 'M6'
+			type = 'M6'
+			PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?superModel=M+Series&gvModel=M6&compositeType=certified&geoZip=95051&geoRadius=0&sortBy=internetPrice+asc&internetPrice=1-9999999"
+		when '550ixDrive'
+			type = '550ixDrive'
+			PAGE_URL = "http://cpo.bmwusa.com/used-inventory/index.htm?year=2013-2013&odometer=1-40000&highwayMpg=&normalPackages=Driver+Assistance&superModel=5+Series&gvModel=550i+xDrive&compositeType=used&geoZip=95051&geoRadius=0&showSelections=true&showFacetCounts=true&showSubmit=true&searchLinkText=SEARCH&facetbrowse=true&showRadius=true"
+		else
+			puts "This search \"" + arg + "\" is currently not supported. Exiting."
+			exit 0
+		end
+	end
 end
+
+if (ARGV.size == 0) or (foundSearch == FALSE)
+	puts "At least one search needs to be specified. Exiting."
+	exit 0
+end
+
 
 nowDate = DateTime.now.strftime("%m-%d-%Y")
 latest_file = Dir[File.join("./", "*.#{type}.yaml")].max_by(&File.method(:ctime))
 
 if !latest_file.nil?
 	if latest_file.include? nowDate
-		puts "Already checked today. Exiting."
-		exit 0
+		if replaceLatestCheck == TRUE
+			File.delete(latest_file)
+			latest_file = Dir[File.join("./", "*.#{type}.yaml")].max_by(&File.method(:ctime))
+		else
+			puts "Already checked today. Exiting."
+			exit 0
+		end
 	end
 	oldVinHash = YAML::load_file(latest_file)
 else
